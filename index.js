@@ -58,15 +58,21 @@ module.exports = function (angel) {
       cellName: angel.cmdData[2]
     }, done)
   })
+    .description('repo cell :cellName -- :cmd')
+    .example('repo cell api -- npm install')
   angel.on(/repo cells -- (.*)/, function (angel, done) {
     executeCommandOnCells({
       cmd: angel.cmdData[1]
     }, done)
   })
+    .description('repo cells -- :cmd')
+    .example('repo cells -- npm install')
   angel.on(/repo cellgroup (.*) -- (.*)/, function (angel, done) {
     executeCommandOnCells({
       cmd: angel.cmdData[1],
       groupName: angel.cmdData[2]
     }, done)
   })
+    .description('repo cellgroup :groupName -- :cmd')
+    .example('repo cellgroup frontend -- npm install')
 }

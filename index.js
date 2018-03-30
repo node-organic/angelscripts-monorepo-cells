@@ -1,13 +1,13 @@
 const execa = require('execa')
 const loadDna = require('organic-dna-loader')
 const path = require('path')
-const colors = require('colors/safe')
+const colors = require('chalk')
 
 module.exports = function (angel) {
   const CELLS_ROOT = angel.cells_root || process.cwd()
   const executeCommand = async function ({ cellName, cmd, cwd, env }) {
     return new Promise((resolve, reject) => {
-      console.log(colors.blue(cellName), cmd, cwd)
+      console.log(colors.blue(cellName), cmd)
       let child = execa.shell(cmd, {
         cwd: cwd,
         env: env
@@ -36,6 +36,9 @@ module.exports = function (angel) {
           cellDna: dna.cells[name]
         })
       }
+      if (tasks.length === 0) {
+        return console.error('no cells found')
+      }
       let tasksCounter = tasks.length
       tasks.forEach(info => {
         executeCommand({
@@ -44,7 +47,7 @@ module.exports = function (angel) {
           cwd: path.join(CELLS_ROOT, 'cells', info.name),
           env: process.env
         }).catch(err => {
-          console.error(colors.red(err))
+          console.error(colors.red(info.name), err)
         }).then(() => {
           tasksCounter -= 1
           if (tasksCounter === 0) done()
@@ -54,25 +57,25 @@ module.exports = function (angel) {
   }
   angel.on(/repo cell (.*) -- (.*)/, function (angel, done) {
     executeCommandOnCells({
-      cmd: angel.cmdData[1],
-      cellName: angel.cmdData[2]
+      cmd: angel.cmdData[2],
+      cellName: angel.cmdData[1]
     }, done)
   })
-    .description('repo cell :cellName -- :cmd')
-    .example('repo cell api -- npm install')
+    .description('executes :cmd on cell by its :name')
+    .example('$ angel repo cell :name -- :cmd')
   angel.on(/repo cells -- (.*)/, function (angel, done) {
     executeCommandOnCells({
       cmd: angel.cmdData[1]
     }, done)
   })
-    .description('repo cells -- :cmd')
-    .example('repo cells -- npm install')
+    .description('executes :cmd on all cells')
+    .example('repo cells -- :cmd')
   angel.on(/repo cellgroup (.*) -- (.*)/, function (angel, done) {
     executeCommandOnCells({
-      cmd: angel.cmdData[1],
-      groupName: angel.cmdData[2]
+      cmd: angel.cmdData[2],
+      groupName: angel.cmdData[1]
     }, done)
   })
-    .description('repo cellgroup :groupName -- :cmd')
-    .example('repo cellgroup frontend -- npm install')
+    .description('executes :cmd on all cells within group with :groupname')
+    .example('repo cellgroup :groupname -- :cmd')
 }

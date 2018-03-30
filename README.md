@@ -20,6 +20,6 @@ Executes `cmd` on all repo cells found under `dna.cells` namespace.
 
 Executes `cmd` on specific repo cell
 
-### repo cell group :name -- :cmd
+### repo cellgroup :name -- :cmd
 
 Executes `cmd` on specific repo group of cells. A group of cells has the same value in `dna.cells.{{{cell-name}}}.group` property

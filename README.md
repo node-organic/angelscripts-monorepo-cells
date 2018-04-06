@@ -5,12 +5,12 @@ angelscripts for monorepo development
 ## usage
 
 ```
-$ npm i angelscripts-help --save-dev
-$ npm i angelscripts-monorepo --save-dev
-$ npx organic-angel help
+$ npm i organic-angel
+$ npm i angelscripts-monorepo
+$ npx angel repo ...
 ```
 
-## supported commands
+## commands
 
 ### repo cells -- :cmd
 

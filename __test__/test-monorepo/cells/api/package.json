@@ -1,1 +1,5 @@
-{}
+{
+  "scripts": {
+    "test": "echo test complete"
+  }
+}

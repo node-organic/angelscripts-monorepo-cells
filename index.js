@@ -18,7 +18,7 @@ module.exports = function (angel) {
       child.stderr.on('data', chunk => {
         console.error(colors.blue(cellName), colors.red(chunk.toString()))
       })
-      child.on('exit', status => {
+      child.on('close', status => {
         if (status !== 0) return reject(new Error(cmd + ' returned ' + status))
         resolve()
       })
@@ -37,7 +37,7 @@ module.exports = function (angel) {
         })
       }
       if (tasks.length === 0) {
-        return console.error('no cells found')
+        throw new Error('no cells found')
       }
       let tasksCounter = tasks.length
       tasks.forEach(info => {
@@ -48,6 +48,7 @@ module.exports = function (angel) {
           env: process.env
         }).catch(err => {
           console.error(colors.red(info.name), err)
+          done(err)
         }).then(() => {
           tasksCounter -= 1
           if (tasksCounter === 0) done()

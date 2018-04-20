@@ -22,4 +22,4 @@ Executes `cmd` on specific repo cell
 
 ### repo cellgroup :name -- :cmd
 
-Executes `cmd` on specific repo group of cells. A group of cells has the same value in `dna.cells.{{{cell-name}}}.group` property
+Executes `cmd` on specific repo group of cells. A group of cells has the same value in `dna.cells.{{{cell-name}}}.group` property || contained in `dna.cells.{{{cell-name}}}.groups` array

@@ -7,7 +7,7 @@ angelscripts for monorepo development
 ```
 $ npm i organic-angel
 $ npm i angelscripts-monorepo
-$ npx angel repo ...
+$ npx angel help repo
 ```
 
 ## commands
@@ -18,7 +18,7 @@ Executes `cmd` on all repo cells found under `dna.cells` namespace.
 
 ### repo cell :name -- :cmd
 
-Executes `cmd` on specific repo cell
+Executes `cmd` on specific repo cell found under `dna.cells` namespace.
 
 ### repo cellgroup :name -- :cmd
 

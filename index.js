@@ -1,8 +1,18 @@
-const execa = require('execa')
+const {exec} = require('child_process')
 const loadDna = require('organic-dna-loader')
 const path = require('path')
 const colors = require('chalk')
 const {forEach} = require('p-iteration')
+const terminate = require('terminate')
+
+const terminateAsync = async function (pid) {
+  return new Promise((resolve, reject) => {
+    terminate(pid, err => {
+      if (err) return reject(err)
+      resolve()
+    })
+  })
+}
 
 const hasGroup = function (cellDna, groupName) {
   let groups = cellDna.groups || []
@@ -12,20 +22,27 @@ const hasGroup = function (cellDna, groupName) {
   return groups.indexOf(groupName) !== -1
 }
 
+const formatCellName = function (value) {
+  return '[' + colors.blue(value) + ']'
+}
+
 module.exports = function (angel) {
   const CELLS_ROOT = angel.cells_root || process.cwd()
-  const executeCommand = async function ({ cellName, cmd, cwd, env }) {
+  const executeCommand = async function ({ cellName, cmd, cwd, env, childHandler }) {
     return new Promise((resolve, reject) => {
-      console.log(colors.blue(cellName), cmd)
-      let child = execa.shell(cmd, {
+      console.log(formatCellName(cellName), cmd)
+      let child = exec(cmd, {
         cwd: cwd,
         env: env
       })
+      if (childHandler) {
+        childHandler(child)
+      }
       child.stdout.on('data', chunk => {
-        console.log(colors.blue(cellName), chunk.toString())
+        console.log(formatCellName(cellName), chunk.toString())
       })
       child.stderr.on('data', chunk => {
-        console.error(colors.blue(cellName), colors.red(chunk.toString()))
+        console.error(formatCellName(cellName), colors.red(chunk.toString()))
       })
       child.on('close', status => {
         if (status !== 0) return reject(new Error(cellName + ' ' + cmd + ' returned ' + status))
@@ -49,14 +66,26 @@ module.exports = function (angel) {
         if (tasks.length === 0) {
           return reject(new Error('no cells found'))
         }
+        let runningChilds = []
+        let childHandler = function (child) {
+          runningChilds.push(child)
+          child.on('close', () => {
+            runningChilds.splice(runningChilds.indexOf(child), 1)
+          })
+        }
         forEach(tasks, async info => {
           return executeCommand({
             cellName: info.name,
             cmd: cmd,
             cwd: path.join(CELLS_ROOT, 'cells', info.name),
-            env: process.env
+            env: process.env,
+            childHandler: childHandler
           })
-        }).then(resolve).catch(reject)
+        }).then(resolve).catch(async err => {
+          let pids = runningChilds.map(v => v.pid)
+          await forEach(pids, terminateAsync)
+          reject(err)
+        })
       })
     })
   }

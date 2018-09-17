@@ -4,6 +4,7 @@ const path = require('path')
 const colors = require('chalk')
 const {forEach} = require('p-iteration')
 const terminate = require('terminate')
+const cellsinfo = require('organic-dna-cells-info')
 
 const terminateAsync = async function (pid) {
   return new Promise((resolve, reject) => {
@@ -12,14 +13,6 @@ const terminateAsync = async function (pid) {
       resolve()
     })
   })
-}
-
-const hasGroup = function (cellDna, groupName) {
-  let groups = cellDna.groups || []
-  if (cellDna.group) {
-    groups.push(cellDna.group)
-  }
-  return groups.indexOf(groupName) !== -1
 }
 
 const formatCellName = function (value) {
@@ -55,14 +48,16 @@ module.exports = function (angel) {
       loadDna(path.join(CELLS_ROOT, 'dna'), async (err, dna) => {
         if (err) return reject(err)
         let tasks = []
-        for (let name in dna.cells) {
-          if (cellName && name !== cellName) continue
-          if (groupName && !hasGroup(dna.cells[name], groupName)) continue
+        let cells = cellsinfo(dna.cells)
+        cells.forEach((cell) => {
+          if (cellName && cell.name !== cellName) return
+          if (groupName && cell.groups.indexOf(groupName) === -1) return
           tasks.push({
-            name: name,
-            cellDna: dna.cells[name]
+            name: cell.name,
+            cellDna: cell.dna,
+            cwd: cell.cwd
           })
-        }
+        })
         if (tasks.length === 0) {
           return reject(new Error('no cells found'))
         }
@@ -73,11 +68,11 @@ module.exports = function (angel) {
             runningChilds.splice(runningChilds.indexOf(child), 1)
           })
         }
-        forEach(tasks, async info => {
+        forEach(tasks, async taskInfo => {
           return executeCommand({
-            cellName: info.name,
+            cellName: taskInfo.name,
             cmd: cmd,
-            cwd: path.join(CELLS_ROOT, 'cells', info.name),
+            cwd: path.join(CELLS_ROOT, taskInfo.cwd),
             env: process.env,
             childHandler: childHandler
           })

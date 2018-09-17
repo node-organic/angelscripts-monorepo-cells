@@ -1,3 +1,5 @@
 {
-  "group": "backend"
+  "group": "backend",
+  "cwd": "cells/api",
+  "build": {}
 }

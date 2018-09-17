@@ -1,3 +1,5 @@
 {
-  "groups": ["test", "web"]
+  "groups": ["test", "web"],
+  "cwd": "cells/web",
+  "build": {}
 }

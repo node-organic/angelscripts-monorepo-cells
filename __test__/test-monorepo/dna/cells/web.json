@@ -1,5 +1,7 @@
 {
   "groups": ["test", "web"],
   "cwd": "cells/web",
-  "build": {}
+  "build": {},
+  "cellKind": "web",
+  "cellInfo": "v1"
 }

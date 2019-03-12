@@ -55,7 +55,7 @@ module.exports = function (angel) {
           tasks.push({
             name: cell.name,
             cellDna: cell.dna,
-            cwd: cell.cwd
+            cwd: cell.dna.cwd
           })
         })
         if (tasks.length === 0) {
@@ -107,4 +107,24 @@ module.exports = function (angel) {
   })
     .description('executes :cmd on all cells within group with :groupname')
     .example('repo cellgroup :groupname -- :cmd')
+  angel.on(/repo list cells/, function (angel, done) {
+    loadDna(path.join(CELLS_ROOT, 'dna'), async (err, dna) => {
+      if (err) throw err
+      let cells = cellsinfo(dna.cells)
+      for (let i = 0; i < cells.length; i++) {
+        console.info(`${cells[i].name} - ${cells[i].dna.cellKind} @ ${cells[i].dna.cwd}`)
+      }
+    })
+  })
+    .description('lists all found cells')
+    .example('repo list cells')
+  angel.on(/repo dump cells.json/, function (angel, done) {
+    loadDna(path.join(CELLS_ROOT, 'dna'), async (err, dna) => {
+      if (err) throw err
+      let cells = cellsinfo(dna.cells)
+      console.info(JSON.stringify(cells))
+    })
+  })
+    .description('dumps all found cells with their resolved DNA included as json')
+    .example('repo dump cells.json')
 }

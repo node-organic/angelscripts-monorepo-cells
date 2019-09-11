@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "test": "ava **/*.test.js",
-    "preversion": "eslint ./",
+    "preversion": "eslint ./ && npm run test",
     "release-patch": "npm version patch && npm publish",
     "release-minor": "npm version minor && npm publish",
     "release-major": "npm version major && npm publish",

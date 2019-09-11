@@ -6,10 +6,5 @@
   "rules": {
     "comma-dangle": [0],
     "camelcase": [0]
-  },
-  "globals": {
-    "test": true,
-    "expect": true,
-    "jest": true
   }
 }

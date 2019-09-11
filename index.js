@@ -42,7 +42,8 @@ module.exports = function (angel) {
         process.stdin.pipe(child.stdin)
         process.stdin.resume()
       }
-      child.on('close', status => {
+      child.on('exit', status => {
+        console.log(formatCellName(cellName), 'exit with status', status)
         if (status !== 0) return reject(new Error(cellName + ' ' + cmd + ' returned ' + status))
         resolve()
       })
@@ -88,7 +89,7 @@ module.exports = function (angel) {
       })
     })
   }
-  angel.on(/repo cell (.*) -- (.*)/, function (angel, done) {
+  angel.on(/cell (.*) -- (.*)/, function (angel, done) {
     executeCommandOnCells({
       cmd: angel.cmdData[2],
       cellName: angel.cmdData[1],
@@ -96,36 +97,38 @@ module.exports = function (angel) {
     }).then(() => done()).catch(done)
   })
     .description('executes :cmd on cell by its :name')
-    .example('$ angel repo cell :name -- :cmd')
-  angel.on(/repo cells -- (.*)/, function (angel, done) {
+    .example('$ angel cell :name -- :cmd')
+  angel.on(/cells -- (.*)/, function (angel, done) {
     executeCommandOnCells({
       cmd: angel.cmdData[1]
     }).then(() => done()).catch(done)
   })
     .description('executes :cmd on all cells')
-    .example('repo cells -- :cmd')
-  angel.on(/repo cellgroup (.*) -- (.*)/, function (angel, done) {
+    .example('cells -- :cmd')
+  angel.on(/cells (.*) -- (.*)/, function (angel, done) {
     executeCommandOnCells({
       cmd: angel.cmdData[2],
       groupName: angel.cmdData[1]
     }).then(() => done()).catch(done)
   })
     .description('executes :cmd on all cells within group with :groupname')
-    .example('repo cellgroup :groupname -- :cmd')
-  angel.on(/repo list cells/, async function (angel, done) {
+    .example('cells :groupname -- :cmd')
+  angel.on(/^cells$/, async function (angel, done) {
     let dna = await loadDna({root: CELLS_ROOT})
     let cells = cellsinfo(dna.cells)
     for (let i = 0; i < cells.length; i++) {
       console.info(`${cells[i].name} - ${cells[i].dna.cellKind} @ ${cells[i].dna.cwd}`)
     }
+    done()
   })
     .description('lists all found cells')
-    .example('repo list cells')
-  angel.on(/repo dump cells.json/, async function (angel, done) {
+    .example('cells')
+  angel.on(/^cells.json$/, async function (angel, done) {
     let dna = await loadDna({root: CELLS_ROOT})
     let cells = cellsinfo(dna.cells)
     console.info(JSON.stringify(cells))
+    done()
   })
-    .description('dumps all found cells with their resolved DNA included as json')
-    .example('repo dump cells.json')
+    .description('dumps all found cells with their DNA included as json')
+    .example('cells.json')
 }

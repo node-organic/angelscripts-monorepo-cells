@@ -3,15 +3,12 @@ const loadDna = require('organic-dna-repo-loader')
 const path = require('path')
 const colors = require('chalk')
 const {forEach} = require('p-iteration')
-const terminate = require('terminate')
 const cellsinfo = require('organic-dna-cells-info')
 
 const terminateAsync = async function (pid) {
   return new Promise((resolve, reject) => {
-    terminate(pid, err => {
-      if (err) return reject(err)
-      resolve()
-    })
+    process.kill(pid)
+    resolve()
   })
 }
 
@@ -27,7 +24,8 @@ module.exports = function (angel) {
       console.log(formatCellName(cellName), cmd)
       let child = exec(cmd, {
         cwd: cwd,
-        env: env
+        env: env,
+        maxBuffer: Infinity
       })
       if (childHandler) {
         childHandler(child)
@@ -44,7 +42,10 @@ module.exports = function (angel) {
       }
       child.on('exit', status => {
         console.log(formatCellName(cellName), 'exit with status', status)
-        if (status !== 0) return reject(new Error(cellName + ' ' + cmd + ' returned ' + status))
+        if (child.terminating) return console.info(formatCellName(cellName), 'was terminated')
+        if (status !== 0) {
+          return reject(new Error(cellName + ' ' + cmd + ' returned ' + status))
+        }
         resolve()
       })
     })
@@ -83,8 +84,13 @@ module.exports = function (angel) {
           forwardStdin: forwardStdin
         })
       }).then(resolve).catch(async err => {
+        runningChilds.forEach(function (child) {
+          child.terminating = true
+        })
         let pids = runningChilds.map(v => v.pid)
-        await forEach(pids, terminateAsync)
+        try {
+          await forEach(pids, terminateAsync)
+        } catch (e) { /** ignore e */ }
         reject(err)
       })
     })

@@ -28,8 +28,7 @@
     "chalk": "^2.3.2",
     "organic-dna-cells-info": "^2.0.1",
     "organic-dna-repo-loader": "^2.0.2",
-    "p-iteration": "^1.1.5",
-    "terminate": "^2.1.0"
+    "p-iteration": "^1.1.5"
   },
   "repository": {
     "type": "git",

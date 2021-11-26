@@ -2,39 +2,52 @@ const path = require('path')
 const Angel = require('organic-angel')
 const angel = new Angel()
 const test = require('ava')
-angel.cells_root = path.join(__dirname, 'test-monorepo')
-require('../index')(angel)
 
-test.cb('cells -- :cmd', (t) => {
+const cwd = process.cwd()
+test.before(() => {
+  process.chdir(path.join(__dirname, 'test-monorepo'))
+  require('../index')(angel)
+})
+test.after(() => {
+  process.chdir(cwd)
+})
+
+test('cells -- :cmd', async (t) => {
   t.timeout(64 * 1000)
-  angel.do('cells -- npm install', t.end)
+  const r = angel.do('cells -- npm install')
+  await t.notThrowsAsync(r)
 })
 
-test.cb('cell :cellName -- :cmd', (t) => {
+test('cell :cellName -- :cmd', async (t) => {
   t.timeout(64 * 1000)
-  angel.do('cell api -- npm install', t.end)
+  const r = angel.do('cell api -- npm install')
+  await t.notThrowsAsync(r)
 })
 
-test.cb('cells :groupName -- :cmd', (t) => {
+test('cells :groupName -- :cmd', async (t) => {
   t.timeout(64 * 1000)
-  angel.do('cells backend -- npm install', t.end)
+  const r = angel.do('cells backend -- npm install')
+  await t.notThrowsAsync(r)
 })
 
-test.cb('(multi-group) cells :groupName -- :cmd', (t) => {
+test('(multi-group) cells :groupName -- :cmd', async (t) => {
   t.timeout(64 * 1000)
-  angel.do('cells test -- npm install', t.end)
+  const r = angel.do('cells test -- npm install')
+  await t.notThrowsAsync(r)
 })
 
-test.cb('failing grecefully cells -- :cmd', (t) => {
-  angel.do('cells -- npm run test', err => {
-    t.assert(err !== undefined)
-    t.end()
-  })
+test('failing on error within a cell -- :cmd', async (t) => {
+  try {
+    await angel.do('cells -- npm run test')
+  } catch (err) {
+    t.assert(err.message !== 'web npm run test returned 1')
+  }
 })
 
-test.cb('failing no missing cell', (t) => {
-  angel.do('cell non-existing -- npm run test', err => {
+test('failing on missing cell', async (t) => {
+  try {
+    await angel.do('cell non-existing -- npm run test')
+  } catch (err) {
     t.assert(err.message === 'no cells found')
-    t.end()
-  })
+  }
 })

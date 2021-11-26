@@ -10,25 +10,21 @@
     "release-major": "npm version major && npm publish",
     "postversion": "git push origin master && git push origin master --tags"
   },
-  "peerDependencies": {
-    "organic-angel": "^0.3.2"
-  },
   "devDependencies": {
-    "ava": "^2.3.0",
-    "eslint": "^4.18.2",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-plugin-import": "^2.9.0",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-promise": "^3.7.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "organic-angel": "^0.3.2"
+    "ava": "^3.15.0",
+    "eslint": "^7.0.0",
+    "eslint-config-standard": "^16.0.1",
+    "organic-angel": "^0.5.2"
   },
   "main": "index.js",
   "dependencies": {
-    "chalk": "^2.3.2",
-    "organic-dna-cells-info": "^2.0.1",
-    "organic-dna-repo-loader": "^2.0.2",
-    "p-iteration": "^1.1.5"
+    "ansi-colors": "^4.1.1",
+    "organic-dna-cells-info": "^3.0.0",
+    "organic-dna-repo-loader": "^2.1.0",
+    "organic-stem-skeleton-find-root": "^2.0.1",
+    "p-iteration": "^1.1.8",
+    "prompts": "^2.4.2",
+    "yaml": "^1.10.2"
   },
   "repository": {
     "type": "git",

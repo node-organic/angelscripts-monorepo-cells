@@ -1,6 +1,6 @@
 # angelscripts-monorepo-cells
 
-angelscripts for monorepo development of cells
+angelscripts for monorepo development of cells based on [organic-stem-skeleton 3.0](https://github.com/node-organic/organic-stem-skeleton)
 
 ## usage
 
@@ -31,3 +31,27 @@ Lists all found cells under repo
 ### cells.json
 
 Returns JSON list of found cells
+
+### create cell
+
+Enters in intercative mode asking for cell to be created with cellName, cellGroup and cellKind properties.
+
+#### create cell :name
+
+Scaffold a monorepo cell or converts existing folder to a cell.
+
+### rename cell
+
+Enters in intercative mode asking for cell name to be renamed.
+
+#### rename cell :oldName :newName
+
+Renames existing cell from oldName to newName. This moves the cell's source code as well.
+
+### delete cell
+
+Enters in intercative mode asking for cell name to be deleted.
+
+#### delete cell :cellName :cellNameAgain
+
+Removes existing cell. This removes the cell's source code as well.

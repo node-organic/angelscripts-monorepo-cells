@@ -24,7 +24,7 @@
     "organic-stem-skeleton-find-root": "^2.0.1",
     "p-iteration": "^1.1.8",
     "prompts": "^2.4.2",
-    "yaml": "^1.10.2"
+    "yaml": "^2.2.2"
   },
   "repository": {
     "type": "git",
